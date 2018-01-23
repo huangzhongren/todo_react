@@ -1,0 +1,30 @@
+{
+  "name": "personal_blog_react",
+  "version": "1.0.0",
+  "description": "a react todo application",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/huangzhongren/personal_blog_react.git"
+  },
+  "scripts": {
+    "start": "webpack-dev-server --hot --inline --colors --content-base ./build",
+    "build": "webpack --progress --colors"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-runtime": "^6.26.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "webpack": "^3.10.0"
+  }
+}
