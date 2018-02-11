@@ -1,18 +1,35 @@
 import React, {Component}from 'react';
-import {Link} from 'react-router-dom';
-const Links = [
-    '<li><Link to="/task"></li>',
-    '<li><Link to="/notes"></li>',
-    '<li><Link to="/project"></li>'
+import {Router,Route,Link,browserHistory} from 'react-router';
+const sidebarLinks = [
+    {
+        name:'任务',
+        path:'task',
+    },
+    {
+        name:'便签',
+        path:'notes',
+    },
+    {
+        name:'分类',
+        path:'category',
+    },
+    {
+        name:'地点',
+        path:'address',
+    },
+    {
+        name:'标签',
+        path:'tags',
+    }
 ]
 export default class Layout extends Component {
     render() {
         return (
             <div className="app-container">
                 <ul className="side-bar">
-                    {Links}
+                    {sidebarLinks.map(link => <li key={link.name}><Link to={link.path}>{link.name}</Link></li>)}
                 </ul>
-                <div className="app-content">
+                <div>
                     {this.props.children}
                 </div>
             </div>
