@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class Task extends React.Component{
+export default class Notes extends React.Component{
     render(){
         return (
             <div>this is notes page</div>
