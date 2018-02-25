@@ -6,7 +6,7 @@ export default class Layout extends Component {
         return (
             <div className="app-container">
                 <SideBar/>
-                <div>
+                <div className="app-content">
                     {this.props.children}
                 </div>
             </div>
