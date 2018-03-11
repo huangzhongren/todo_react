@@ -113,7 +113,7 @@ export default class Calendar extends React.Component {
                     </DropDownMenu>
                     <DropDownMenu
                         maxHeight={300}
-                        value={this.state.selectMonth}
+                        value={this.state.selectMonth+1}
                         onChange={this.handleMonthChange}
                         style={style.selectMonth}
                         labelStyle={style.labelStyle}
