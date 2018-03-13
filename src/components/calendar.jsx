@@ -54,21 +54,33 @@ export default class Calendar extends React.Component {
         this.state = {
             selectDate:new Date().getDate(),
             selectYear:new Date().getFullYear(),
-            selectMonth: new Date().getMonth()
-        }
+            selectMonth: new Date().getMonth(),
+            calendarLeft:0,
+            calendarTop:0,
+            startx:0,
+            starty:0,
+            isDragging:false,
+        };
         this.handleClick=this.handleClick.bind(this);
         this.handleYearChange=this.handleYearChange.bind(this);
-        this.handleMonthChange=this.handleMonthChange.bind(this)
+        this.handleMonthChange=this.handleMonthChange.bind(this);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
     }
     componentWillMount(){
-        console.log(this.props)
+        console.log(1)
+    }
+    componentDidMount(){
+        console.log(this.refs.calendar.style)
+        // this.setState({
+        //     calendarLeft:this.refs.calendar.style.left,
+        //     calendarTop:this.refs.calendar.style.top
+        // })
     }
     handleClick(e){
         let date = new Date(e.target.getAttribute('date'));
         this.setState({selectDate:date.getDate(),selectYear:date.getFullYear(),selectMonth:date.getMonth()})
     }
     handleYearChange = (e,i,value)=>{
-        console.log(value)
         this.setState({selectYear:value})
     }
     handleMonthChange = (e,i,value)=>{
@@ -76,6 +88,24 @@ export default class Calendar extends React.Component {
     }
     handleDateChange = (e,i,value)=>{
         this.setState({selectDate:value})
+    }
+    handleMouseDown = (e)=>{
+        this.refs.dragArea.style.cursor = 'move';
+        this.setState({
+            isDragging:true,
+            startx:e.pageX,
+            starty:e.pageY,
+        })
+    }
+    handleMouseUp = (e)=>{
+        this.refs.dragArea.style.cursor = 'default';
+    }
+    calendarMove = (e)=>{
+        let calendar = this.refs.calendar;
+        if(this.state.isDragging){
+            calendar.style.left = this.state.calendarLeft+e.pageX-this.state.startx;
+            calendar.style.top = this.state.calendarTop+e.pageY-this.state.starty;
+        }
     }
     render() {
         let calTrs = [],
@@ -99,7 +129,8 @@ export default class Calendar extends React.Component {
             }
         }
         return (
-            <Paper className='calendar'>
+            <Paper className='calendar' onMouseMove={this.calendarMove} ref="calendar">
+                <div onMouseDown={this.handleMouseDown} onMouseUp = {this.handleMouseUp} ref="dragArea">sssssdddddddddd</div>
                 <div className="flex-between">
                     <DropDownMenu
                         maxHeight={300}
