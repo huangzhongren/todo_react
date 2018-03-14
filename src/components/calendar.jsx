@@ -7,8 +7,10 @@ import Divider from 'material-ui/Divider';
 
 const days = ['一','二','三','四','五','六','日'];
 const style = {
-    calendatHeader:{
-
+    dragArea:{
+        cursor:"move",
+        height:30,
+        userSelect:"none"
     },
     selectYear:{
         width:100,
@@ -67,14 +69,13 @@ export default class Calendar extends React.Component {
         this.handleMouseDown = this.handleMouseDown.bind(this);
     }
     componentWillMount(){
-        console.log(1)
+
     }
     componentDidMount(){
-        console.log(this.refs.calendar.style)
-        // this.setState({
-        //     calendarLeft:this.refs.calendar.style.left,
-        //     calendarTop:this.refs.calendar.style.top
-        // })
+        this.setState({
+            calendarLeft:this.refs.calendar.offsetLeft,
+            calendarTop:this.refs.calendar.offsetTop
+        })
     }
     handleClick(e){
         let date = new Date(e.target.getAttribute('date'));
@@ -90,21 +91,28 @@ export default class Calendar extends React.Component {
         this.setState({selectDate:value})
     }
     handleMouseDown = (e)=>{
-        this.refs.dragArea.style.cursor = 'move';
         this.setState({
             isDragging:true,
             startx:e.pageX,
             starty:e.pageY,
         })
-    }
-    handleMouseUp = (e)=>{
-        this.refs.dragArea.style.cursor = 'default';
-    }
+    };
+
+    handleMoveEnd = (e)=>{
+        this.setState({
+            isDragging:false,
+            calendarLeft:this.refs.calendar.offsetLeft,
+            calendarTop:this.refs.calendar.offsetTop
+        })
+    };
     calendarMove = (e)=>{
+        if(e.preventDefault){
+            e.preventDefault();
+        }
         let calendar = this.refs.calendar;
         if(this.state.isDragging){
-            calendar.style.left = this.state.calendarLeft+e.pageX-this.state.startx;
-            calendar.style.top = this.state.calendarTop+e.pageY-this.state.starty;
+            calendar.style.left = this.state.calendarLeft+e.pageX-this.state.startx +'px';
+            calendar.style.top = this.state.calendarTop+e.pageY-this.state.starty+'px';
         }
     }
     render() {
@@ -129,8 +137,8 @@ export default class Calendar extends React.Component {
             }
         }
         return (
-            <Paper className='calendar' onMouseMove={this.calendarMove} ref="calendar">
-                <div onMouseDown={this.handleMouseDown} onMouseUp = {this.handleMouseUp} ref="dragArea">sssssdddddddddd</div>
+            <div className='calendar' onMouseMove={this.calendarMove} ref="calendar">
+                <div onMouseDown={this.handleMouseDown} onMouseUp = {this.handleMoveEnd} ref="dragArea" onMouseLeave={this.handleMoveEnd} style={style.dragArea}>sssssdddddddddd</div>
                 <div className="flex-between">
                     <DropDownMenu
                         maxHeight={300}
@@ -170,7 +178,7 @@ export default class Calendar extends React.Component {
                     </tr>)}
                     </tbody>
                 </table>
-            </Paper>
+            </div>
         );
     }
 
