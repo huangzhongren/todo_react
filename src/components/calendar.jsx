@@ -3,7 +3,8 @@ import Paper from 'material-ui/Paper';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
-import Divider from 'material-ui/Divider';
+import Draggable from 'react-draggable';
+import FontIcon from 'material-ui/FontIcon'
 
 const days = ['一','二','三','四','五','六','日'];
 const style = {
@@ -57,25 +58,16 @@ export default class Calendar extends React.Component {
             selectDate:new Date().getDate(),
             selectYear:new Date().getFullYear(),
             selectMonth: new Date().getMonth(),
-            calendarLeft:0,
-            calendarTop:0,
-            startx:0,
-            starty:0,
-            isDragging:false,
         };
         this.handleClick=this.handleClick.bind(this);
         this.handleYearChange=this.handleYearChange.bind(this);
         this.handleMonthChange=this.handleMonthChange.bind(this);
-        this.handleMouseDown = this.handleMouseDown.bind(this);
     }
     componentWillMount(){
 
     }
     componentDidMount(){
-        this.setState({
-            calendarLeft:this.refs.calendar.offsetLeft,
-            calendarTop:this.refs.calendar.offsetTop
-        })
+
     }
     handleClick(e){
         let date = new Date(e.target.getAttribute('date'));
@@ -89,31 +81,6 @@ export default class Calendar extends React.Component {
     }
     handleDateChange = (e,i,value)=>{
         this.setState({selectDate:value})
-    }
-    handleMouseDown = (e)=>{
-        this.setState({
-            isDragging:true,
-            startx:e.pageX,
-            starty:e.pageY,
-        })
-    };
-
-    handleMoveEnd = (e)=>{
-        this.setState({
-            isDragging:false,
-            calendarLeft:this.refs.calendar.offsetLeft,
-            calendarTop:this.refs.calendar.offsetTop
-        })
-    };
-    calendarMove = (e)=>{
-        if(e.preventDefault){
-            e.preventDefault();
-        }
-        let calendar = this.refs.calendar;
-        if(this.state.isDragging){
-            calendar.style.left = this.state.calendarLeft+e.pageX-this.state.startx +'px';
-            calendar.style.top = this.state.calendarTop+e.pageY-this.state.starty+'px';
-        }
     }
     render() {
         let calTrs = [],
@@ -137,48 +104,51 @@ export default class Calendar extends React.Component {
             }
         }
         return (
-            <div className='calendar' onMouseMove={this.calendarMove} ref="calendar">
-                <div onMouseDown={this.handleMouseDown} onMouseUp = {this.handleMoveEnd} ref="dragArea" onMouseLeave={this.handleMoveEnd} style={style.dragArea}>sssssdddddddddd</div>
-                <div className="flex-between">
-                    <DropDownMenu
-                        maxHeight={300}
-                        value={this.state.selectYear}
-                        onChange={this.handleYearChange}
-                        style={style.selectYear}
-                        labelStyle={style.labelStyle}
-                        iconStyle={style.iconStyle}
-                    >
-                        {yearItems}
-                    </DropDownMenu>
-                    <DropDownMenu
-                        maxHeight={300}
-                        value={this.state.selectMonth+1}
-                        onChange={this.handleMonthChange}
-                        style={style.selectMonth}
-                        labelStyle={style.labelStyle}
-                        iconStyle={style.iconStyle}
-                    >
-                        {monthItems}
-                    </DropDownMenu>
-                    <FlatButton
-                        primary={true}
-                        label="返回今天"
-                        style={style.flatButton}
-                    />
-                </div>
-                <div className="line-blue margin-10"></div>
-                <table cellSpacing='0'>
+            <Draggable handle=".dragArea" bounds="parent">
+                <div className='calendar'>
+                    <h4 className="dragArea">
+                        <FontIcon className="material-icons"></FontIcon>日历</h4>
+                    <div className="flex-between">
+                        <DropDownMenu
+                            maxHeight={300}
+                            value={this.state.selectYear}
+                            onChange={this.handleYearChange}
+                            style={style.selectYear}
+                            labelStyle={style.labelStyle}
+                            iconStyle={style.iconStyle}
+                        >
+                            {yearItems}
+                        </DropDownMenu>
+                        <DropDownMenu
+                            maxHeight={300}
+                            value={this.state.selectMonth+1}
+                            onChange={this.handleMonthChange}
+                            style={style.selectMonth}
+                            labelStyle={style.labelStyle}
+                            iconStyle={style.iconStyle}
+                        >
+                            {monthItems}
+                        </DropDownMenu>
+                        <FlatButton
+                            primary={true}
+                            label="返回今天"
+                            style={style.flatButton}
+                        />
+                    </div>
+                    <div className="line-blue margin-10"></div>
+                    <table cellSpacing='0'>
 
-                    <tbody>
-                    <tr>
-                        {days.map((day, index) => <td key={index}>{day}</td>)}
-                    </tr>
-                    {calTrs.map((trDom, idx) => <tr key={idx}>
-                        {trDom}
-                    </tr>)}
-                    </tbody>
-                </table>
-            </div>
+                        <tbody>
+                        <tr>
+                            {days.map((day, index) => <td key={index}>{day}</td>)}
+                        </tr>
+                        {calTrs.map((trDom, idx) => <tr key={idx}>
+                            {trDom}
+                        </tr>)}
+                        </tbody>
+                    </table>
+                </div>
+            </Draggable>
         );
     }
 

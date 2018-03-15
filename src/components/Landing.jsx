@@ -17,7 +17,7 @@ const style = {
 export default class Landing extends React.Component{
     render(){
         return (
-            <div className='landing'>
+            <div className='landing hv_center'>
                 <RaisedButton label="登录" style={style.signinBtn} primary={true} href="user/login" />
                 <RaisedButton label="注册" style={style.registerBtn} href="user/register"/>
                 <Calendar/>
