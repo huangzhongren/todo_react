@@ -5,7 +5,8 @@ import MenuItem from 'material-ui/MenuItem';
 import FlatButton from 'material-ui/FlatButton';
 import Draggable from 'react-draggable';
 import FontIcon from 'material-ui/FontIcon'
-
+import utils from '../js/utils'
+import Calendardetail from './calendetail';
 const days = ['一','二','三','四','五','六','日'];
 const style = {
     dragArea:{
@@ -38,7 +39,13 @@ const style = {
     },
     flatButton:{
         height:34
-    }
+    },
+    nagetiveDate:{
+        color:"#b1a8a8"
+    },
+    positiveDate:{
+        color:"#ddddd"
+    },
 }
 const yearItems = [],
       monthItems = [];
@@ -54,14 +61,20 @@ for(let i=1;i<=12;i++){
 export default class Calendar extends React.Component {
     constructor(props){
         super(props);
+        let Year = new Date().getFullYear(),
+            Month = new Date().getMonth(),
+            date = new Date().getDate();
         this.state = {
-            selectDate:new Date().getDate(),
-            selectYear:new Date().getFullYear(),
-            selectMonth: new Date().getMonth(),
+            selectDate:Date,
+            selectYear:Year,
+            selectMonth:Month,
+            data:utils.calendar.solar2lunar(Year,Month+1,date)
         };
         this.handleClick=this.handleClick.bind(this);
         this.handleYearChange=this.handleYearChange.bind(this);
         this.handleMonthChange=this.handleMonthChange.bind(this);
+        this.lastMonth = this.lastMonth.bind(this);
+        this.nextMonth = this.nextMonth.bind(this);
     }
     componentWillMount(){
 
@@ -69,18 +82,43 @@ export default class Calendar extends React.Component {
     componentDidMount(){
 
     }
-    handleClick(e){
-        let date = new Date(e.target.getAttribute('date'));
-        this.setState({selectDate:date.getDate(),selectYear:date.getFullYear(),selectMonth:date.getMonth()})
+    handleClick(e,data){
+        console.log(data);
+        this.setState({
+            selectYear:data.cYear,
+            selectMonth:data.cMonth-1,
+            selectDate:data.cDay,
+            data:data
+        });
     }
     handleYearChange = (e,i,value)=>{
         this.setState({selectYear:value})
     }
     handleMonthChange = (e,i,value)=>{
-        this.setState({selectMonth:value})
+        this.setState({selectMonth:value-1})
     }
     handleDateChange = (e,i,value)=>{
         this.setState({selectDate:value})
+    }
+    lastMonth=(e)=>{
+        if(e.preventDefault){
+            e.preventDefault()
+        }
+        if(this.state.selectMonth===0){
+            this.setState({selectYear:this.state.selectYear-1,selectMonth:11})
+        }else{
+            this.setState({selectMonth:this.state.selectMonth-1})
+        }
+    }
+    nextMonth=(e)=>{
+        if(e.preventDefault){
+            e.preventDefault()
+        }
+        if(this.state.selectMonth===11){
+            this.setState({selectYear:this.state.selectYear+1,selectMonth:1})
+        }else{
+            this.setState({selectMonth:this.state.selectMonth+1})
+        }
     }
     render() {
         let calTrs = [],
@@ -90,63 +128,77 @@ export default class Calendar extends React.Component {
         let baseMonth = this.state.selectMonth,
             bd = this.state.selectDate,
             baseYear = this.state.selectYear;
+        let positiveDate = false;
         for(let i=-5;i<=37;i++){
             let date = new Date(baseYear,baseMonth,i),
-                day = date.getDay(),
+                year = date.getFullYear(),
+                month = date.getMonth()+1,
+                day = date.getDate(),
                 dom;
+            let data = utils.calendar.solar2lunar(year,month,day);
             if(day===1){
+                positiveDate = !positiveDate;
+            }
+            if(data.nWeek===1){
                 calTds  = [];
             }
-            dom = <td key={i} className={(bd===i?'selected':'')+" "+(date.getTime()===today.getTime()?'current':'')}  onClick={this.handleClick}><a href="javascript:void(0)" date={date}>{date.getDate()}</a></td>;
+            dom = <td key={i} onClick={e=>this.handleClick(e,data)}>
+                <a href="javascript:void(0)" date-index={date} style={!positiveDate?style.nagetiveDate:style.positiveDate}>
+                    <span className={"solar "+(bd===i?"selected":"")+" "+(data.isToday?"current":"")}>{date.getDate()}</span>
+                    <span className="lunar">{data.IDayCn}</span>
+                </a>
+            </td>;
             calTds.push(dom);
-            if(day===0&&calTds.length===7){
+            if(data.nWeek===7&&calTds.length===7){
                 calTrs.push(calTds)
             }
         }
         return (
             <Draggable handle=".dragArea" bounds="parent">
                 <div className='calendar'>
-                    <h4 className="dragArea">
-                        <FontIcon className="material-icons"></FontIcon>日历</h4>
-                    <div className="flex-between">
-                        <DropDownMenu
-                            maxHeight={300}
-                            value={this.state.selectYear}
-                            onChange={this.handleYearChange}
-                            style={style.selectYear}
-                            labelStyle={style.labelStyle}
-                            iconStyle={style.iconStyle}
-                        >
-                            {yearItems}
-                        </DropDownMenu>
-                        <DropDownMenu
-                            maxHeight={300}
-                            value={this.state.selectMonth+1}
-                            onChange={this.handleMonthChange}
-                            style={style.selectMonth}
-                            labelStyle={style.labelStyle}
-                            iconStyle={style.iconStyle}
-                        >
-                            {monthItems}
-                        </DropDownMenu>
-                        <FlatButton
-                            primary={true}
-                            label="返回今天"
-                            style={style.flatButton}
-                        />
+                    <div>
+                        <h4 className="dragArea flex-between">
+                            <FontIcon className="material-icons" onClick={this.lastMonth}>chevron_left</FontIcon>日历<FontIcon className="material-icons" onClick={this.nextMonth}>chevron_right</FontIcon></h4>
+                        <div className="flex-between">
+                            <DropDownMenu
+                                maxHeight={300}
+                                value={this.state.selectYear}
+                                onChange={this.handleYearChange}
+                                style={style.selectYear}
+                                labelStyle={style.labelStyle}
+                                iconStyle={style.iconStyle}
+                            >
+                                {yearItems}
+                            </DropDownMenu>
+                            <DropDownMenu
+                                maxHeight={300}
+                                value={this.state.selectMonth+1}
+                                onChange={this.handleMonthChange}
+                                style={style.selectMonth}
+                                labelStyle={style.labelStyle}
+                                iconStyle={style.iconStyle}
+                            >
+                                {monthItems}
+                            </DropDownMenu>
+                            <FlatButton
+                                primary={true}
+                                label="返回今天"
+                                style={style.flatButton}
+                            />
+                        </div>
+                        <div className="line-blue margin-10"></div>
+                        <table cellSpacing='0'>
+                            <tbody>
+                            <tr>
+                                {days.map((day, index) => <td key={index}>{day}</td>)}
+                            </tr>
+                            {calTrs.map((trDom, idx) => <tr key={idx}>
+                                {trDom}
+                            </tr>)}
+                            </tbody>
+                        </table>
                     </div>
-                    <div className="line-blue margin-10"></div>
-                    <table cellSpacing='0'>
-
-                        <tbody>
-                        <tr>
-                            {days.map((day, index) => <td key={index}>{day}</td>)}
-                        </tr>
-                        {calTrs.map((trDom, idx) => <tr key={idx}>
-                            {trDom}
-                        </tr>)}
-                        </tbody>
-                    </table>
+                    <Calendardetail data = {this.state.data}/>
                 </div>
             </Draggable>
         );
